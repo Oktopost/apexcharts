@@ -32136,16 +32136,6 @@
           var xAxis = new XAxis(_this2.ctx, elgrid);
           var yaxis = new YAxis(_this2.ctx, elgrid);
 
-          if (elgrid !== null) {
-            xAxis.xAxisLabelCorrections(elgrid.xAxisTickWidth);
-            yaxis.setYAxisTextAlignments();
-            w.config.yaxis.map(function (yaxe, index) {
-              if (w.globals.ignoreYAxisIndexes.indexOf(index) === -1) {
-                yaxis.yAxisTitleRotate(index, yaxe.opposite);
-              }
-            });
-          }
-
           if (w.config.annotations.position === 'back') {
             w.globals.dom.Paper.add(w.globals.dom.elAnnotations);
             me.annotations.drawAxesAnnotations();
@@ -32182,6 +32172,16 @@
 
           if (w.config.chart.type !== 'treemap') {
             me.axes.drawAxis(w.config.chart.type, elgrid);
+          }
+
+          if (elgrid !== null) {
+            xAxis.xAxisLabelCorrections(elgrid.xAxisTickWidth);
+            yaxis.setYAxisTextAlignments();
+            w.config.yaxis.map(function (yaxe, index) {
+              if (w.globals.ignoreYAxisIndexes.indexOf(index) === -1) {
+                yaxis.yAxisTitleRotate(index, yaxe.opposite);
+              }
+            });
           }
 
           if (!w.globals.noData) {

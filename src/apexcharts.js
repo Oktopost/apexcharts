@@ -275,16 +275,6 @@ export default class ApexCharts {
 
       let xAxis = new XAxis(this.ctx, elgrid)
       let yaxis = new YAxis(this.ctx, elgrid)
-      if (elgrid !== null) {
-        xAxis.xAxisLabelCorrections(elgrid.xAxisTickWidth)
-        yaxis.setYAxisTextAlignments()
-
-        w.config.yaxis.map((yaxe, index) => {
-          if (w.globals.ignoreYAxisIndexes.indexOf(index) === -1) {
-            yaxis.yAxisTitleRotate(index, yaxe.opposite)
-          }
-        })
-      }
 
       if (w.config.annotations.position === 'back') {
         w.globals.dom.Paper.add(w.globals.dom.elAnnotations)
@@ -322,6 +312,17 @@ export default class ApexCharts {
 
       if (w.config.chart.type !== 'treemap') {
         me.axes.drawAxis(w.config.chart.type, elgrid)
+      }
+
+      if (elgrid !== null) {
+        xAxis.xAxisLabelCorrections(elgrid.xAxisTickWidth)
+        yaxis.setYAxisTextAlignments()
+
+        w.config.yaxis.map((yaxe, index) => {
+          if (w.globals.ignoreYAxisIndexes.indexOf(index) === -1) {
+            yaxis.yAxisTitleRotate(index, yaxe.opposite)
+          }
+        })
       }
 
       if (!w.globals.noData) {
