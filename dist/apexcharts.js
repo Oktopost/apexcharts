@@ -1,6 +1,6 @@
 /*!
- * ApexCharts v3.36.2
- * (c) 2018-2022 ApexCharts
+ * ApexCharts v3.36.3
+ * (c) 2018-2023 ApexCharts
  * Released under the MIT License.
  */
 (function (global, factory) {
@@ -5864,19 +5864,6 @@
         var options = new Options();
         var defaults = new Defaults(opts);
         this.chartType = opts.chart.type;
-
-        if (this.chartType === 'histogram') {
-          // technically, a histogram can be drawn by a column chart with no spaces in between
-          opts.chart.type = 'bar';
-          opts = Utils$1.extend({
-            plotOptions: {
-              bar: {
-                columnWidth: '99.99%'
-              }
-            }
-          }, opts);
-        }
-
         opts = this.extendYAxis(opts);
         opts = this.extendAnnotations(opts);
         var config = options.init();
@@ -5884,7 +5871,7 @@
 
         if (opts && _typeof(opts) === 'object') {
           var chartDefaults = {};
-          var chartTypes = ['line', 'area', 'bar', 'candlestick', 'boxPlot', 'rangeBar', 'rangeArea', 'histogram', 'bubble', 'scatter', 'heatmap', 'treemap', 'pie', 'polarArea', 'donut', 'radar', 'radialBar'];
+          var chartTypes = ['line', 'area', 'bar', 'candlestick', 'boxPlot', 'rangeBar', 'rangeArea', 'bubble', 'scatter', 'heatmap', 'treemap', 'pie', 'polarArea', 'donut', 'radar', 'radialBar'];
 
           if (chartTypes.indexOf(opts.chart.type) !== -1) {
             chartDefaults = defaults[opts.chart.type]();
@@ -9498,7 +9485,7 @@
           });
           var elXAxisTitleText = graphics.drawText({
             x: w.globals.gridWidth / 2 + w.config.xaxis.title.offsetX,
-            y: this.offY + parseFloat(this.xaxisFontSize) + (w.config.xaxis.title.position === 'bottom' ? w.globals.xAxisLabelsHeight : -w.globals.xAxisLabelsHeight - 10) + w.config.xaxis.title.offsetY,
+            y: this.offY + parseFloat(this.xaxisFontSize) + (w.config.xaxis.position === 'bottom' ? w.globals.xAxisLabelsHeight : -w.globals.xAxisLabelsHeight - 10) + w.config.xaxis.title.offsetY,
             text: w.config.xaxis.title.text,
             textAnchor: 'middle',
             fontSize: w.config.xaxis.title.style.fontSize,
@@ -9700,11 +9687,28 @@
               multiY = label.length / 2 * parseInt(ylabels.style.fontSize, 10);
             }
 
+            var offsetX = ylabels.offsetX - 15;
+            var textAnchor = 'end';
+
+            if (_this2.yaxis.opposite) {
+              textAnchor = 'start';
+            }
+
+            if (w.config.yaxis[0].labels.align === 'left') {
+              offsetX = ylabels.offsetX;
+              textAnchor = 'start';
+            } else if (w.config.yaxis[0].labels.align === 'center') {
+              offsetX = ylabels.offsetX;
+              textAnchor = 'middle';
+            } else if (w.config.yaxis[0].labels.align === 'right') {
+              textAnchor = 'end';
+            }
+
             var elLabel = graphics.drawText({
-              x: ylabels.offsetX - 15,
+              x: offsetX,
               y: yPos + colHeight + ylabels.offsetY - multiY,
               text: label,
-              textAnchor: _this2.yaxis.opposite ? 'start' : 'end',
+              textAnchor: textAnchor,
               foreColor: getForeColor(),
               fontSize: ylabels.style.fontSize,
               fontFamily: ylabels.style.fontFamily,
@@ -11616,6 +11620,20 @@
               xPad = xPad * -1;
             }
 
+            var textAnchor = 'end';
+
+            if (w.config.yaxis[realIndex].opposite) {
+              textAnchor = 'start';
+            }
+
+            if (w.config.yaxis[realIndex].labels.align === 'left') {
+              textAnchor = 'start';
+            } else if (w.config.yaxis[realIndex].labels.align === 'center') {
+              textAnchor = 'middle';
+            } else if (w.config.yaxis[realIndex].labels.align === 'right') {
+              textAnchor = 'end';
+            }
+
             var yColors = _this.axesUtils.getYAxisForeColor(yaxisStyle.colors, realIndex);
 
             var getForeColor = function getForeColor() {
@@ -11626,7 +11644,7 @@
               x: xPad,
               y: l + tickAmount / 10 + w.config.yaxis[realIndex].labels.offsetY + 1,
               text: val,
-              textAnchor: w.config.yaxis[realIndex].opposite ? 'start' : 'end',
+              textAnchor: textAnchor,
               fontSize: yaxisFontSize,
               fontFamily: yaxisFontFamily,
               fontWeight: yaxisFontWeight,
@@ -11950,7 +11968,7 @@
         yaxis.forEach(function (y, index) {
           var yaxe = w.config.yaxis[index]; // proceed only if user has specified alignment
 
-          if (yaxe && yaxe.labels.align !== undefined) {
+          if (yaxe && !yaxe.floating && yaxe.labels.align !== undefined) {
             var yAxisInner = w.globals.dom.baseEl.querySelector(".apexcharts-yaxis[rel='".concat(index, "'] .apexcharts-yaxis-texts-g"));
             var yAxisTexts = w.globals.dom.baseEl.querySelectorAll(".apexcharts-yaxis[rel='".concat(index, "'] .apexcharts-yaxis-label"));
             yAxisTexts = Utils$1.listToArray(yAxisTexts);
@@ -24922,7 +24940,7 @@
 
           var year = this._getYear(currentYear, month, yrCounter);
 
-          pos = hour === 0 && i === 0 ? remainingMins * minutesWidthOnXAxis : 60 * minutesWidthOnXAxis + pos;
+          pos = 60 * minutesWidthOnXAxis + pos;
           var val = hour === 0 ? date : hour;
           this.timeScaleArray.push({
             position: pos,
@@ -32103,17 +32121,16 @@
 
           me.grid = new Grid(me);
           var elgrid = me.grid.drawGrid();
-
-          if (w.config.chart.type !== 'treemap') {
-            me.axes.drawAxis(w.config.chart.type, elgrid);
-          }
-
           me.annotations = new Annotations(me);
           me.annotations.drawImageAnnos();
           me.annotations.drawTextAnnos();
 
           if (w.config.grid.position === 'back' && elgrid) {
             w.globals.dom.elGraphical.add(elgrid.el);
+
+            if (elgrid.elGridBorders && elgrid.elGridBorders.node) {
+              w.globals.dom.elGraphical.add(elgrid.elGridBorders);
+            }
           }
 
           var xAxis = new XAxis(_this2.ctx, elgrid);
@@ -32144,10 +32161,10 @@
 
           if (w.config.grid.position === 'front' && elgrid) {
             w.globals.dom.elGraphical.add(elgrid.el);
-          }
 
-          if (elgrid && elgrid.elGridBorders && elgrid.elGridBorders.node) {
-            w.globals.dom.elGraphical.add(elgrid.elGridBorders);
+            if (elgrid.elGridBorders && elgrid.elGridBorders.node) {
+              w.globals.dom.elGraphical.add(elgrid.elGridBorders);
+            }
           }
 
           if (w.config.xaxis.crosshairs.position === 'front') {
@@ -32161,6 +32178,10 @@
           if (w.config.annotations.position === 'front') {
             w.globals.dom.Paper.add(w.globals.dom.elAnnotations);
             me.annotations.drawAxesAnnotations();
+          }
+
+          if (w.config.chart.type !== 'treemap') {
+            me.axes.drawAxis(w.config.chart.type, elgrid);
           }
 
           if (!w.globals.noData) {
