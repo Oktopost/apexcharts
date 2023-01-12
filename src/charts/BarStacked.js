@@ -13,6 +13,20 @@ import Utils from '../utils/Utils'
 
 class BarStacked extends Bar {
   draw(series, seriesIndex) {
+    let lastSeriesByDataPoint = {};
+
+    for (let rowIndex = 0; rowIndex < this.w.globals.dataPoints; rowIndex++)
+    {
+      for (let index = series.length - 1; index >= 0; index--)
+      {
+        if (series[index][rowIndex] !== 0)
+        {
+          lastSeriesByDataPoint[rowIndex] = index;
+          break;
+        }
+      }
+    }
+
     let w = this.w
     this.graphics = new Graphics(this.ctx)
     this.bar = new Bar(this.ctx, this.xyRatios)
@@ -146,7 +160,8 @@ class BarStacked extends Bar {
           strokeWidth,
           x,
           y,
-          elSeries
+          elSeries,
+          lastSeries: lastSeriesByDataPoint[j]
         }
         let paths = null
         if (this.isHorizontal) {
@@ -291,7 +306,8 @@ class BarStacked extends Bar {
     x,
     y,
     yDivision,
-    elSeries
+    elSeries,
+    lastSeries
   }) {
     let w = this.w
     let barYPosition = y
@@ -348,7 +364,8 @@ class BarStacked extends Bar {
       realIndex: indexes.realIndex,
       i,
       j,
-      w
+      w,
+      lastSeries
     })
 
     this.barHelpers.barBackground({
@@ -379,7 +396,8 @@ class BarStacked extends Bar {
     barWidth,
     zeroH,
     strokeWidth,
-    elSeries
+    elSeries,
+    lastSeries
   }) {
     let w = this.w
     let i = indexes.i
@@ -477,7 +495,8 @@ class BarStacked extends Bar {
       realIndex: indexes.realIndex,
       i,
       j,
-      w
+      w,
+      lastSeries
     })
 
     this.barHelpers.barBackground({

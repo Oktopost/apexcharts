@@ -18885,6 +18885,7 @@
     }, {
       key: "shouldApplyRadius",
       value: function shouldApplyRadius(realIndex) {
+        var lastSeries = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
         var w = this.w;
         var applyRadius = false;
 
@@ -18892,6 +18893,8 @@
           if (w.config.chart.stacked) {
             if (w.config.plotOptions.bar.borderRadiusWhenStacked === 'last') {
               if (this.barCtx.lastActiveBarSerieIndex === realIndex) {
+                applyRadius = true;
+              } else if (realIndex === lastSeries) {
                 applyRadius = true;
               }
             } else {
@@ -18943,7 +18946,8 @@
             realIndex = _ref2.realIndex,
             i = _ref2.i,
             j = _ref2.j,
-            w = _ref2.w;
+            w = _ref2.w,
+            lastSeries = _ref2.lastSeries;
         var graphics = new Graphics(this.barCtx.ctx);
         strokeWidth = Array.isArray(strokeWidth) ? strokeWidth[realIndex] : strokeWidth;
         if (!strokeWidth) strokeWidth = 0;
@@ -18973,7 +18977,7 @@
 
         pathFrom = pathFrom + graphics.line(x1, y1) + sl + sl + sl + sl + sl + graphics.line(x1, y1) + (w.config.plotOptions.bar.borderRadiusApplication === 'around' ? ' Z' : ' z');
 
-        if (this.shouldApplyRadius(realIndex)) {
+        if (this.shouldApplyRadius(realIndex, lastSeries)) {
           pathTo = graphics.roundPathCorners(pathTo, w.config.plotOptions.bar.borderRadius);
         }
 
@@ -19001,7 +19005,8 @@
             realIndex = _ref3.realIndex,
             i = _ref3.i,
             j = _ref3.j,
-            w = _ref3.w;
+            w = _ref3.w,
+            lastSeries = _ref3.lastSeries;
         var graphics = new Graphics(this.barCtx.ctx);
         strokeWidth = Array.isArray(strokeWidth) ? strokeWidth[realIndex] : strokeWidth;
         if (!strokeWidth) strokeWidth = 0;
@@ -19029,7 +19034,7 @@
         pathTo = pathTo + graphics.line(x2, y1) + graphics.line(x2, y2 - strokeWidth) + sl + (w.config.plotOptions.bar.borderRadiusApplication === 'around' ? ' Z' : ' z');
         pathFrom = pathFrom + graphics.line(x1, y1) + sl + sl + sl + sl + sl + graphics.line(x1, y1) + (w.config.plotOptions.bar.borderRadiusApplication === 'around' ? ' Z' : ' z');
 
-        if (this.shouldApplyRadius(realIndex)) {
+        if (this.shouldApplyRadius(realIndex, lastSeries)) {
           pathTo = graphics.roundPathCorners(pathTo, w.config.plotOptions.bar.borderRadius);
         }
 
@@ -19653,6 +19658,17 @@
       value: function draw(series, seriesIndex) {
         var _this = this;
 
+        var lastSeriesByDataPoint = {};
+
+        for (var rowIndex = 0; rowIndex < this.w.globals.dataPoints; rowIndex++) {
+          for (var index = series.length - 1; index >= 0; index--) {
+            if (series[index][rowIndex] !== 0) {
+              lastSeriesByDataPoint[rowIndex] = index;
+              break;
+            }
+          }
+        }
+
         var w = this.w;
         this.graphics = new Graphics(this.ctx);
         this.bar = new Bar(this.ctx, this.xyRatios);
@@ -19793,7 +19809,8 @@
               strokeWidth: strokeWidth,
               x: x,
               y: y,
-              elSeries: elSeries
+              elSeries: elSeries,
+              lastSeries: lastSeriesByDataPoint[j]
             };
             var paths = null;
 
@@ -19932,7 +19949,8 @@
             x = _ref.x,
             y = _ref.y,
             yDivision = _ref.yDivision,
-            elSeries = _ref.elSeries;
+            elSeries = _ref.elSeries,
+            lastSeries = _ref.lastSeries;
         var w = this.w;
         var barYPosition = y;
         var barXPosition;
@@ -19975,7 +19993,8 @@
           realIndex: indexes.realIndex,
           i: i,
           j: j,
-          w: w
+          w: w,
+          lastSeries: lastSeries
         });
         this.barHelpers.barBackground({
           j: j,
@@ -20004,7 +20023,8 @@
             barWidth = _ref2.barWidth,
             zeroH = _ref2.zeroH;
             _ref2.strokeWidth;
-            var elSeries = _ref2.elSeries;
+            var elSeries = _ref2.elSeries,
+            lastSeries = _ref2.lastSeries;
         var w = this.w;
         var i = indexes.i;
         var j = indexes.j;
@@ -20088,7 +20108,8 @@
           realIndex: indexes.realIndex,
           i: i,
           j: j,
-          w: w
+          w: w,
+          lastSeries: lastSeries
         });
         this.barHelpers.barBackground({
           bc: bc,

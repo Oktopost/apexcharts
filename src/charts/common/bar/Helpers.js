@@ -201,7 +201,7 @@ export default class Helpers {
     return strokeWidth
   }
 
-  shouldApplyRadius(realIndex) {
+  shouldApplyRadius(realIndex, lastSeries = false) {
     const w = this.w
     let applyRadius = false
 
@@ -210,6 +210,10 @@ export default class Helpers {
         if (w.config.plotOptions.bar.borderRadiusWhenStacked === 'last') {
           if (this.barCtx.lastActiveBarSerieIndex === realIndex) {
             applyRadius = true
+          }
+          else if (realIndex === lastSeries)
+          {
+            applyRadius = true;
           }
         } else {
           applyRadius = true
@@ -260,7 +264,8 @@ export default class Helpers {
     realIndex,
     i,
     j,
-    w
+    w,
+    lastSeries
   }) {
     const graphics = new Graphics(this.barCtx.ctx)
     strokeWidth = Array.isArray(strokeWidth)
@@ -316,7 +321,7 @@ export default class Helpers {
         ? ' Z'
         : ' z')
 
-    if (this.shouldApplyRadius(realIndex)) {
+    if (this.shouldApplyRadius(realIndex, lastSeries)) {
       pathTo = graphics.roundPathCorners(
         pathTo,
         w.config.plotOptions.bar.borderRadius
@@ -344,7 +349,8 @@ export default class Helpers {
     realIndex,
     i,
     j,
-    w
+    w,
+    lastSeries
   }) {
     const graphics = new Graphics(this.barCtx.ctx)
     strokeWidth = Array.isArray(strokeWidth)
@@ -398,7 +404,7 @@ export default class Helpers {
         ? ' Z'
         : ' z')
 
-    if (this.shouldApplyRadius(realIndex)) {
+    if (this.shouldApplyRadius(realIndex, lastSeries)) {
       pathTo = graphics.roundPathCorners(
         pathTo,
         w.config.plotOptions.bar.borderRadius
